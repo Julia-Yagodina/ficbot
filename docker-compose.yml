@@ -1,36 +1,33 @@
-version: '3.8'
+version: '3.9'
 
 services:
   app:
-    build: .
+    build: .  # Собирает образ из Dockerfile в текущей директории
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Пробрасываем порт приложения
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_healthy  # Ждем готовности БД
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mini_fics
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update  # Автообновление схемы БД
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_TOKEN}
       TELEGRAM_BOT_USERNAME: EveningFicBot
 
   db:
-    image: postgres:13
+    image: postgres:13  # Используем официальный образ PostgreSQL
     environment:
       POSTGRES_DB: mini_fics
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-        interval: 10s
-        timeout: 5s
-        retries: 3
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Проброс порта для доступа извне (опционально)
 
-volumes:
-  postgres_data:
